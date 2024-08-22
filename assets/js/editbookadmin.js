@@ -46,24 +46,65 @@ document
     .addEventListener("click", async (event) => {
         event.preventDefault();
         try {
-            const title = document.getElementById("title").value;
-            const author = document.getElementById("author").value;
-            const description = document.getElementById("description").value;
-            const launch_year = parseInt(document.getElementById("launch_year").value, 10);
-            const isbn = document.getElementById("isbn").value;
-            const cover_image_url = document.getElementById("cover_image_url").value;
+            const title = document.getElementById("title").value.trim();
+            const author = document.getElementById("author").value.trim();
+            const description = document.getElementById("description").value.trim();
+            const launch_year = parseInt(document.getElementById("launch_year").value.trim(), 10);
+            const isbn = document.getElementById("isbn").value.trim();
+            const cover_image_url = document.getElementById("cover_image_url").value.trim();
             const id_book = localStorage.getItem("currentBookId");
-            
+
+            // Validate inputs
+            if (!title || !author || !description || isNaN(launch_year) || !isbn || !cover_image_url) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "Please fill all fields with valid values.",
+                });
+                return;
+            }
+
+            // Validate launch_year
+            if (launch_year < 1900 || launch_year > new Date().getFullYear()) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid launch year",
+                    text: "The year must be between 1900 and the current year.",
+                });
+                return;
+            }
+
+            // Validate ISBN (simple validation)
+            const isbnPattern = /^(97(8|9))?\d{9}(\d|X)$/;
+            if (!isbnPattern.test(isbn)) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid ISBN",
+                    text: "The ISBN must be 10 or 13 digits long, with optional prefix '978' or '979'.",
+                });
+                return;
+            }
+
+            // Validate cover_image_url (basic URL check)
+            const urlPattern = /^(-|https?:\/\/[^\s/$.?#].[^\s]*)$/;
+            if (!urlPattern.test(cover_image_url)) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid cover image URL",
+                    text: "URL must start with http:// or https:// or just be a dash (-).",
+                });
+                return;
+            }
+
             await postData(title, author, description, launch_year, isbn, cover_image_url, id_book);
         } catch (error) {
-            console.error("Error to edit book:", error);
+            console.error("Error editing book:", error);
             displayError("Failed to edit book", error.message);
         }
     });
 
 async function postData(title, author, description, launch_year, isbn, cover_image_url, id_book) {
-    const IdBook = localStorage.getItem("currentBookId");
-    const url = `http://127.0.0.1:3000/books/update?id_book=${IdBook}`;
+    const url = `http://127.0.0.1:3000/books/update?id_book=${id_book}`;
     const token = localStorage.getItem("LOGIN");
     const newData = {
         title,
@@ -103,7 +144,7 @@ function displaySuccess(message) {
         text: message,
         confirmButtonText: "See dashboard",
         showCancelButton: true,
-        cancelButtonText: "Stay in this page",
+        cancelButtonText: "Stay on this page",
     }).then((result) => {
         if (result.isConfirmed) {
             window.location.href = "dashboard-admin.html";
