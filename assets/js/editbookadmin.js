@@ -103,7 +103,7 @@ function displaySuccess(message) {
         text: message,
         confirmButtonText: "See dashboard",
         showCancelButton: true,
-        canelButtonText: "Stay in this page",
+        cancelButtonText: "Stay in this page",
     }).then((result) => {
         if (result.isConfirmed) {
             window.location.href = "dashboard-admin.html";
