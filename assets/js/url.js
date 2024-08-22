@@ -1,6 +1,7 @@
 export const endpointRegister = "http://127.0.0.1:3000/register";
 export const endpointLogin = "http://127.0.0.1:3000/login";
 
+export const endpointCheckUsername = "http://127.0.0.1:3000/checkusername";
 export const endpointGetUser = "http://127.0.0.1:3000/auth";
 
 export const endpointGetAllBooks = "http://127.0.0.1:3000/books";
